@@ -3,6 +3,7 @@ const path = require('path');
 
 // External Module
 const express = require('express');
+const db = require('./utils/databaseUtil');
 
 //Local Module
 const storeRouter = require("./routes/storeRouter")
@@ -11,6 +12,14 @@ const rootDir = require("./utils/pathUtil");
 const errorsController = require("./controllers/errors");
 
 const app = express();
+db.execute('SELECT * FROM homes')
+  .then(([rows,fields]) => {
+    // Handle the query result
+    console.log('Getting homes from DB:', rows);
+  })
+  .catch(err => {
+    console.error('Error occurred while fetching homes:', err);
+  })
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
