@@ -1,35 +1,32 @@
-// Core Modules
-const db = require("../utils/databaseUtil");
+const mongoose = require('mongoose');
+const favourite = require('./favourite');
 
-module.exports = class Home {
-  constructor(name, price, location, rating, imageUrl, description, id) {
-    this.name = name;
-    this.price = price;
-    this.location = location;
-    this.rating = rating;
-    this.imageUrl = imageUrl;
-    this.description = description;
-    this.id = id;
-  }
+const homeSchema = mongoose.Schema({
+  houseName: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  rating: {
+    type: Number,
+    required: true
+  },
+  photoUrl: String,
+  description: String,
+});
 
-  save() {
-    if (this.id) { // update
-      return db.execute('UPDATE homes SET name=?, price=?, location=?, rating=?, imageUrl=?, description=? WHERE id=?', [this.name, this.price, this.location, this.rating, this.imageUrl, this.description, this.id]);
+homeSchema.pre('findOneAndDelete', async function(next) {
+  console.log('Came to pre hook while deleting a home');
+  const homeId = this.getQuery()._id;
+  await favourite.deleteMany({houseId: homeId});
+  next();
+});
 
-    } else { // insert
-      return db.execute('INSERT INTO homes (name, price, location, rating, imageUrl, description) VALUES (?, ?, ?, ?, ?, ?)', [this.name, this.price, this.location, this.rating, this.imageUrl, this.description]);
-    }
-  }
-
-  static fetchAll() {
-    return db.execute('SELECT * FROM homes');
-  }
-
-  static findById(homeId) {
-    return db.execute('SELECT * FROM homes WHERE id=?', [homeId]);
-  }
-
-  static deleteById(homeId) {
-    return db.execute('DELETE FROM homes WHERE id=?', [homeId]);
-  }
-};
+module.exports = mongoose.model('Home', homeSchema);
