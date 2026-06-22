@@ -77,6 +77,7 @@
 // Core Module
 // Core Module
 // 
+require('dotenv').config();
 const path = require('path');
 
 // External Module
@@ -85,7 +86,7 @@ const session = require('express-session');
 const { MongoStore } = require('connect-mongo');
 const { default: mongoose } = require('mongoose');
 const multer = require('multer');
-const DB_PATH = "mongodb+srv://suryachauhan6607_db_user:test1234@cluster0.kitiywg.mongodb.net/airbnb?retryWrites=true&w=majority&appName=Cluster0";
+const DB_PATH = process.env.DB_PATH;
 
 //Local Module
 const storeRouter = require("./routes/storeRouter")
@@ -142,7 +143,7 @@ app.use("/host/uploads", express.static(path.join(rootDir, 'uploads')))
 app.use("/homes/uploads", express.static(path.join(rootDir, 'uploads')))
 
 app.use(session({
-  secret: "KnowledgeGate AI with Complete Coding",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store,
@@ -170,8 +171,7 @@ app.use("/host", (req, res, next) => {
 app.use("/host", hostRouter);
 
 app.use(errorsController.pageNotFound);
-
-const PORT = 3004;
+const PORT = process.env.PORT || 3004;
 
 mongoose.connect(DB_PATH).then(() => {
   console.log('Connected to Mongo');
